@@ -1,0 +1,5 @@
+gymnasium>=0.28
+numpy
+matplotlib
+pandas
+seaborn
