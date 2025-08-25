@@ -78,7 +78,7 @@ def run_algorithms(grid: Grid, start, goal, scenario: int) -> List[Dict]:
         t0 = time.time()
         path, explored = func()
         elapsed = time.time() - t0
-        actions, cost = path_cost(path, cost_scenario2) if path else (0, 0)
+        actions, cost = path_cost(path, cost_fn) if path else (0, 0)
         records.append(
             {
                 "algorithm_name": name,
