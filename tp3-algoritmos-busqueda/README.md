@@ -36,15 +36,26 @@ python code/busquedas.py --escenario 1 --algoritmo bfs
 python code/busquedas.py --escenario 2 --algoritmo astar
 ```
 
+> **Nota:** la función `dls` de búsqueda en profundidad limitada fue corregida para
+> evitar ciclos mediante un conjunto de estados visitados.
+
 ### 3. Evaluación estadística
 
 Para repetir las ejecuciones en entornos aleatorios y generar los resultados:
 
 ```bash
+# Ejecución completa (puede demorar varios minutos)
 python code/evaluacion.py --runs 30 --size 100 --p 0.92
+
+# Prueba rápida sobre mapas más pequeños
+python code/evaluacion.py --runs 30 --size 20 --p 0.92
 ```
 
-Los resultados numéricos se almacenarán en `results.csv` y las gráficas se guardarán en `images/`.
+El script ejecuta los **dos escenarios de costos** (uniforme y diferenciado),
+por lo que genera 480 registros: 30 entornos × 8 algoritmos × 2 escenarios.
+Los resultados numéricos, con la columna adicional `scenario`, se almacenarán
+en `results.csv` y las gráficas podrán generarse en la carpeta `images/`
+(no versionadas).
 
 ### 4. Análisis
 
