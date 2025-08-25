@@ -120,19 +120,22 @@ def dfs(grid: Grid, start: Position, goal: Position) -> Tuple[Optional[List[Posi
 
 def dls(grid: Grid, start: Position, goal: Position, limit: int) -> Tuple[Optional[List[Position]], int]:
     explored = 0
+    visited: set[Position] = set()
 
     def recursive(node: Node) -> Optional[Node]:
         nonlocal explored
         explored += 1
+        visited.add(node.position)
         if node.position == goal:
             return node
         if node.depth == limit:
             return None
         for new_pos, action in neighbors(grid, node.position):
-            child = Node(new_pos, node, action, depth=node.depth + 1)
-            result = recursive(child)
-            if result is not None:
-                return result
+            if new_pos not in visited:
+                child = Node(new_pos, node, action, depth=node.depth + 1)
+                result = recursive(child)
+                if result is not None:
+                    return result
         return None
 
     result = recursive(Node(start, None, None))
