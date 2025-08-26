@@ -89,8 +89,11 @@ def run_algorithms(
         full_path, explored = func()
         elapsed = time.time() - t0
         success = bool(full_path) and full_path[-1] == goal
-        path = full_path if success else None
-        actions, cost = path_cost(path, cost_fn) if path else (0, 0)
+
+        # Si hay solución válida, calculamos métricas sobre ella.
+        # Si no, guardamos (0,0).
+        actions, cost = path_cost(full_path, cost_fn) if success else (0, 0)
+
         records.append(
             {
                 "algorithm_name": name,
