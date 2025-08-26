@@ -65,23 +65,36 @@ def random_search(
     start: Position,
     goal: Position,
     max_steps: int = 1000,
+    return_full_path: bool = False,
 ) -> Tuple[Optional[List[Position]], int]:
-    """Perform a random walk until the goal is reached or step limit exceeded."""
+    """Perform a random walk that can fall into holes.
+
+    If ``return_full_path`` is ``True`` the full sequence of visited states is
+    returned even when the walk ends in failure. Otherwise ``None`` is returned
+    when the agent does not reach the goal.
+    """
     pos = start
     path = [pos]
     explored = {pos}
     for _ in range(max_steps):
         if pos == goal:
             return path, len(explored)
-        neigh = list(neighbors(grid, pos))
-        if not neigh:
-            return None, len(explored)
-        pos, _ = random.choice(neigh)
+        moves = []
+        for dr, dc in MOVES.values():
+            new_pos = (pos[0] + dr, pos[1] + dc)
+            if in_bounds(grid, new_pos):
+                moves.append(new_pos)
+        if not moves:
+            return (path if return_full_path else None), len(explored)
+        pos = random.choice(moves)
         path.append(pos)
         explored.add(pos)
-        if grid[pos[0]][pos[1]] == "H":
-            return None, len(explored)
-    return None, len(explored)
+        tile = grid[pos[0]][pos[1]]
+        if tile == "H":
+            return (path if return_full_path else None), len(explored)
+        if pos == goal:
+            return path, len(explored)
+    return (path if return_full_path else None), len(explored)
 
 
 def bfs(grid: Grid, start: Position, goal: Position) -> Tuple[Optional[List[Position]], int]:

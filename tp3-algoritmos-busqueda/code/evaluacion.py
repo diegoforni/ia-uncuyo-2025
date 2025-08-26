@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+import random
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -53,8 +54,14 @@ def path_cost(path: List[Tuple[int, int]], cost_fn) -> Tuple[int, int]:
     return actions, cost
 
 
-def run_algorithms(grid: Grid, start, goal, scenario: int) -> List[Dict]:
-    """Run all algorithms for the given scenario."""
+def run_algorithms(
+    grid: Grid, start, goal, scenario: int
+) -> Tuple[List[Dict], Dict[str, List[Tuple[int, int]]]]:
+    """Run all algorithms for the given scenario.
+
+    Returns the metrics records and a mapping of algorithm name to the path it
+    followed (which may be empty if no steps were taken).
+    """
     if scenario == 1:
         cost_fn = cost_scenario1
         heuristic = heuristic_scenario1
@@ -63,7 +70,9 @@ def run_algorithms(grid: Grid, start, goal, scenario: int) -> List[Dict]:
         heuristic = heuristic_scenario2
 
     algos = {
-        "RANDOM": lambda: random_search(grid, start, goal),
+        "RANDOM": lambda: random_search(
+            grid, start, goal, return_full_path=True
+        ),
         "BFS": lambda: bfs(grid, start, goal),
         "DFS": lambda: dfs(grid, start, goal),
         "DLS50": lambda: dls(grid, start, goal, 50),
@@ -74,11 +83,13 @@ def run_algorithms(grid: Grid, start, goal, scenario: int) -> List[Dict]:
     }
 
     records: List[Dict] = []
+    paths: Dict[str, List[Tuple[int, int]]] = {}
     for name, func in algos.items():
         t0 = time.time()
-        path, explored = func()
+        full_path, explored = func()
         elapsed = time.time() - t0
-        actions, cost = path_cost(path, cost_fn) if path else (0, 0)
+        success = bool(full_path) and full_path[-1] == goal
+        actions, cost = path_cost(full_path, cost_fn)
         records.append(
             {
                 "algorithm_name": name,
@@ -86,11 +97,12 @@ def run_algorithms(grid: Grid, start, goal, scenario: int) -> List[Dict]:
                 "actions_count": actions,
                 "actions_cost": cost,
                 "time": elapsed,
-                "solution_found": bool(path),
+                "solution_found": success,
                 "scenario": scenario,
             }
         )
-    return records
+        paths[name] = full_path
+    return records, paths
 
 
 def main() -> None:
@@ -101,20 +113,35 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--results", type=Path, default=Path("results.csv"))
     parser.add_argument("--images", type=Path, default=Path("images"))
+    parser.add_argument("--envs", type=Path, default=Path("envs"))
+    parser.add_argument("--paths", type=Path, default=Path("paths"))
     args = parser.parse_args()
 
     args.images.mkdir(parents=True, exist_ok=True)
+    args.envs.mkdir(parents=True, exist_ok=True)
+    args.paths.mkdir(parents=True, exist_ok=True)
 
     all_records: List[Dict] = []
     for env_n in range(1, args.runs + 1):
         desc = generate_random_map_custom(args.size, args.p, seed=args.seed + env_n)
         start = find_tile(desc, "S")
         goal = find_tile(desc, "G")
+
+        with open(args.envs / f"env_{env_n}.txt", "w") as f:
+            f.write("\n".join(desc) + "\n")
+
+        random.seed(args.seed + env_n)
+
         for scenario in (1, 2):
-            records = run_algorithms(desc, start, goal, scenario)
+            records, paths = run_algorithms(desc, start, goal, scenario)
             for r in records:
                 r["env_n"] = env_n
             all_records.extend(records)
+            for algo_name, path in paths.items():
+                path_file = args.paths / f"env_{env_n}_{algo_name}_s{scenario}.txt"
+                with open(path_file, "w") as f:
+                    for pos in path or []:
+                        f.write(f"{pos[0]},{pos[1]}\n")
 
     columns = [
         "algorithm_name",
