@@ -1,0 +1,77 @@
+# ---- Python bytecode and caches ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ---- Environment files ----
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# ---- Packaging / build artifacts ----
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+lib/
+lib64/
+wheels/
+share/python-wheels/
+pip-wheel-metadata/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ---- Logs and coverage ----
+*.log
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.hypothesis/
+cover/
+
+# ---- Type checking / static analysis ----
+.mypy_cache/
+.pytype/
+.pyre/
+.ruff_cache/
+
+# ---- Test/automation envs ----
+.tox/
+.nox/
+
+# ---- Jupyter / IPython ----
+.ipynb_checkpoints/
+profile_default/
+
+# ---- Editors / IDEs ----
+.idea/
+.vscode/
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- Caches ----
+.cache/
+
+# ---- Optional project directories ----
+__pypackages__/
+site/
+
+# Keep data, images, and CSVs tracked unless explicitly excluded.
