@@ -86,6 +86,15 @@ El agente percibe su ubicación y si la casilla contiene un agujero o es la meta
 3. **Impresión de resultados**
    Al finalizar cada ejecución se muestra el mapa generado y la secuencia de estados desde el origen hasta la meta si se encontró solución.
 
+### Nota sobre tamaño de mapas y heurísticas usadas en las evaluaciones
+
+- Tamaño de mapas: las ejecuciones de evaluación (`code/evaluacion.py`) usan por defecto `--size 100`, es decir, mapas de 100×100 generados con `generate_random_map_custom` (ver `code/env_utils.py`). Si en algún experimento concreto se desea usar 20×20 debe pasarse `--size 20` al script de evaluación o a `code/busquedas.py`.
+- Heurísticas para A*: se implementaron dos heurísticas, una por cada escenario:
+   - Escenario 1: heurística Manhattan (h(a,b) = |a0-b0| + |a1-b1|), usada con costo uniforme. (Definida como `heuristic_scenario1` en `code/busquedas.py` / `code/evaluacion.py`.)
+   - Escenario 2: Manhattan ponderada (h(a,b) = |Δcol|*1 + |Δrow|*10), coherente con el modelo de costos del escenario (definida como `heuristic_scenario2`).
+
+Estas definiciones aparecen en `code/busquedas.py` y `code/evaluacion.py`, que pasan la heurística correspondiente a la implementación de A*.
+
 ## Evaluación estadística
 
 Ejecutar 30 veces cada algoritmo sobre entornos aleatorios y guardar los resultados:
